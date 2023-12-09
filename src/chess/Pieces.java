@@ -5,7 +5,7 @@ public class Pieces {
 	public static int king = 1;
 	public static int pawn = 2;
 	public static int bishop= 3;
-	public static int knignt = 4;
+	public static int knight = 4;
 	public static int rook = 5;
 	public static int queen = 6;
 	
