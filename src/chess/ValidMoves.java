@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.LinkedList;
 
 public class ValidMoves {
-	public static final int[] directionOffsets = { 8, -8, -1, 1, 7, -7, -9, 9 };
+	public static final int[] directionOffsets = { -8, 8, -1, 1, -7, 7, 9, -9 };
+
 	public static int[][] NumberOfSquaresToEdge = new int[64][];
 
 	static void precomputedMoveData() {
@@ -35,6 +36,8 @@ public class ValidMoves {
 					generateSlidingMoves(startSquare, piece);
 				} else if (Pieces.isType(piece, Pieces.pawn)) {
 					generatePawnMoves(startSquare, piece);
+				} else if (Pieces.isType(piece, Pieces.knight)) {
+					generateKnightMoves(startSquare, piece);
 				}
 			}
 		}
@@ -54,7 +57,7 @@ public class ValidMoves {
 		for (int directionIndex = startDirectionIndex; directionIndex < endDirectionIndex; directionIndex++) {
 			for (int n = 0; n < NumberOfSquaresToEdge[startSquare][directionIndex]; n++) {
 //				out of bound index
-				int targetSquare = startSquare + directionOffsets[directionIndex] * n + 1;
+				int targetSquare = startSquare + directionOffsets[directionIndex] * (n +1) ;
 
 				if (targetSquare >= 0 && targetSquare < 64) {
 					int pieceOnTargetSquare = Board.squares[targetSquare];
@@ -75,23 +78,69 @@ public class ValidMoves {
 			}
 		}
 	}
-	
+
 	private static void generatePawnMoves(int startSquare, int piece) {
-		int startDirIndex = (Pieces.isColour(piece, Pieces.black))?0 : 1;
-		int endDirIndex = (Pieces.isColour(piece, Pieces.white))?2:1;
-		for(int directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
-			for(int n = 1; n <= NumberOfSquaresToEdge[startSquare][directionIndex]; n++) {
-				int targetSquare = startSquare + directionOffsets[directionIndex] *n;
-				
-				if(targetSquare >=0 && targetSquare<64) {
+		int startDirIndex = (Pieces.isColour(piece, Pieces.black)) ? 1 : 0;
+		int endDirIndex = (Pieces.isColour(piece, Pieces.white)) ? 1 : 2;
+		for (int directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
+			for (int n = 1; n <= NumberOfSquaresToEdge[startSquare][directionIndex]; n++) {
+				int targetSquare = startSquare + directionOffsets[directionIndex] * n;
+
+				if (targetSquare >= 0 && targetSquare < 64) {
 					int pieceOnTargetSquare = Board.squares[targetSquare];
-					
-					if(Pieces.isColour(pieceOnTargetSquare, friendlyPiece))break;
-					
+
+					if (Pieces.isColour(pieceOnTargetSquare, friendlyPiece))
+						break;
+
 					moves.add(new Move(startSquare, targetSquare));
-					
-					if(Pieces.isColour(pieceOnTargetSquare, opponentPiece)) break;
+
+					if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
+						break;
 				}
+			}
+		}
+	}
+
+	private static void generateKnightMoves(int startSquare, int piece) {
+		int rank = startSquare / 8;
+		int file = startSquare % 8;
+		List<Integer> knightOffset = new LinkedList<>();
+		if (file + 2 <= 7 && rank + 1 <= 7) {
+			knightOffset.add((file + 2) + (rank + 1) * 8);
+		}
+		if (file - 2 >= 0 && rank + 1 <= 7) {
+			knightOffset.add((file - 2) + (rank + 1) * 8);
+		}
+		if (file + 2 <= 7 && rank - 1 >= 0) {
+			knightOffset.add((file + 2) + (rank - 1) * 8);
+		}
+		if (file - 2 >= 0 && rank - 1 >= 0) {
+			knightOffset.add((file - 2) + (rank - 1) * 8);
+		}
+		if (file + 1 <= 7 && rank + 2 <= 7) {
+			knightOffset.add((file + 1) + (rank + 2) * 8);
+		}
+		if (file - 1 >= 0 && rank + 2 <= 7) {
+			knightOffset.add((file - 1) + (rank + 2) * 8);
+		}
+		if (file + 1 <= 7 && rank - 2 >= 0) {
+			knightOffset.add((file + 1) + (rank - 2) * 8);
+		}
+		if (file - 1 >= 0 && rank - 2 >= 0) {
+			knightOffset.add((file - 1) + (rank - 2) * 8);
+		}
+		for (int directionIndex = 0; directionIndex < knightOffset.size(); directionIndex++) {
+			int targetSquare = knightOffset.get(directionIndex);
+			if (targetSquare >= 0 && targetSquare < 64) {
+				int pieceOnTargetSquare = Board.squares[targetSquare];
+
+				if (Pieces.isColour(pieceOnTargetSquare, friendlyPiece))
+					continue;
+
+				moves.add(new Move(startSquare, targetSquare));
+
+				if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
+					continue;
 			}
 		}
 	}
