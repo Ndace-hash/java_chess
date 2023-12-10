@@ -95,7 +95,8 @@ public class ValidMoves {
 
 				moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
-				if (rank == 6 || rank == 2) {
+				if ((rank == 6 && Pieces.isColour(piece, Pieces.white))
+						|| (rank == 1 && Pieces.isColour(piece, Pieces.black))) {
 					targetSquare = startSquare + directionOffsets[directionIndex] * 2;
 					if (Pieces.isColour(pieceOnTargetSquare, friendlyPiece))
 						continue;
