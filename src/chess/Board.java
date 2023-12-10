@@ -1,13 +1,23 @@
 package chess;
 
 import java.util.HashMap;
+import java.util.Stack;
+
 
 public class Board {
 	static int[] squares;
-	HashMap<Character, Integer> pieceTypeBySymbol;
-	HashMap<Integer, Character> pieceTypeByNumber = new HashMap<>();
+	static Stack<Move> playedMoves = new Stack<>();
+	static HashMap<Character, Integer> pieceTypeBySymbol;
+	static HashMap<Integer, Character> pieceTypeByNumber = new HashMap<>();
 	static int colourToMove;
-	public static boolean isWhiteMove = true;
+	private static boolean isWhiteMove = true;
+	
+	public static void setIsWhiteMove(boolean isWhiteMove) {
+		Board.isWhiteMove = isWhiteMove;
+	}
+	public static boolean getIsWhiteMove() {
+		return Board.isWhiteMove;
+	}
 
 	Board() {
 		String startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq 1";
@@ -17,6 +27,28 @@ public class Board {
 		this.fen(startFen);
 		colourToMove = isWhiteMove ? Pieces.white : Pieces.black;
 
+		printBoard();
+		ValidMoves.precomputedMoveData();
+		ValidMoves.generateMove();
+		
+		int rand = (int) Math.floor(Math.random()*ValidMoves.moves.size());
+		Move move = ValidMoves.moves.get(rand);
+		makeMove(move);
+		
+		rand = (int) Math.floor(Math.random()*ValidMoves.moves.size());
+		move = ValidMoves.moves.get(rand);
+		makeMove(move);
+		
+		rand = (int) Math.floor(Math.random()*ValidMoves.moves.size());
+		move = ValidMoves.moves.get(rand);
+		makeMove(move);
+		
+		unMakeMove();
+		unMakeMove();
+		unMakeMove();
+	}
+
+	private static void printBoard() {
 		for (int i = 0; i < squares.length; i++) {
 			int piece = squares[i];
 			char symbol = pieceTypeByNumber.get(piece);
@@ -26,11 +58,8 @@ public class Board {
 				System.out.print('\n');
 			}
 		}
-		ValidMoves.precomputedMoveData();
-		ValidMoves.generateMove();
-
+		System.out.println();
 	}
-
 	private void pieceSymbolMapper() {
 //		piece number to symbol map
 		pieceTypeByNumber.put(Pieces.king | Pieces.black, 'k');
@@ -85,5 +114,26 @@ public class Board {
 			}
 
 		}
+	}
+	
+	public static void makeMove(Move move) {
+		int piece = Board.squares[move.getStartSquare()];
+		
+		Board.squares[move.getStartSquare()] = Pieces.none;
+		Board.squares[move.getTargetSquare()] = piece;
+		
+		playedMoves.push(move);
+		isWhiteMove = !isWhiteMove;
+		Board.printBoard();
+		ValidMoves.generateMove();
+	}
+	
+	public static void unMakeMove() {
+		Move move = playedMoves.pop();
+		
+		Board.squares[move.getStartSquare()] = move.getPiece();
+		Board.squares[move.getTargetSquare()] = move.getPieceOnTargetSquare();
+		
+		Board.printBoard();
 	}
 }

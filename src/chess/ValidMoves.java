@@ -28,6 +28,7 @@ public class ValidMoves {
 	static List<Move> moves;
 
 	public static List<Move> generateMove() {
+		Board.colourToMove = Board.getIsWhiteMove() ? Pieces.white : Pieces.black;
 		moves = new LinkedList<>();
 		for (int startSquare = 0; startSquare < 64; startSquare++) {
 			int piece = Board.squares[startSquare];
@@ -41,16 +42,12 @@ public class ValidMoves {
 				}
 			}
 		}
-		for (Move move : moves) {
-			System.out.println(move.getStartSquare() + " " + move.getTargetSquare());
-		}
 		return moves;
 	}
 
-	private static int friendlyPiece = Board.isWhiteMove ? Pieces.white : Pieces.black;
-	private static int opponentPiece = Board.isWhiteMove ? Pieces.black : Pieces.white;
-
 	private static void generateSlidingMoves(int startSquare, int piece) {
+		int friendlyPiece = Board.getIsWhiteMove() ? Pieces.white : Pieces.black;
+		int opponentPiece = Board.getIsWhiteMove() ? Pieces.black : Pieces.white;
 		int startDirectionIndex = (Pieces.isType(piece, Pieces.bishop)) ? 4 : 0;
 		int endDirectionIndex = (Pieces.isType(piece, Pieces.rook)) ? 4 : 8;
 
@@ -67,7 +64,7 @@ public class ValidMoves {
 						break;
 					}
 
-					moves.add(new Move(startSquare, targetSquare));
+					moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
 					if (Pieces.isColour(pieceOnTargetSquare, opponentPiece)) {
 						break;
@@ -80,6 +77,8 @@ public class ValidMoves {
 	}
 
 	private static void generatePawnMoves(int startSquare, int piece) {
+		int friendlyPiece = Board.getIsWhiteMove() ? Pieces.white : Pieces.black;
+		int opponentPiece = Board.getIsWhiteMove() ? Pieces.black : Pieces.white;
 		int startDirIndex = (Pieces.isColour(piece, Pieces.black)) ? 1 : 0;
 		int endDirIndex = (Pieces.isColour(piece, Pieces.white)) ? 1 : 2;
 		for (int directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
@@ -94,7 +93,7 @@ public class ValidMoves {
 				if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
 					continue;
 
-				moves.add(new Move(startSquare, targetSquare));
+				moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
 				if (rank == 6 || rank == 2) {
 					targetSquare = startSquare + directionOffsets[directionIndex] * 2;
@@ -103,7 +102,7 @@ public class ValidMoves {
 					if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
 						continue;
 
-					moves.add(new Move(startSquare, targetSquare));
+					moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
 				}
 
@@ -112,6 +111,8 @@ public class ValidMoves {
 	}
 
 	private static void generateKnightMoves(int startSquare, int piece) {
+		int friendlyPiece = Board.getIsWhiteMove() ? Pieces.white : Pieces.black;
+		int opponentPiece = Board.getIsWhiteMove() ? Pieces.black : Pieces.white;
 		int rank = startSquare / 8;
 		int file = startSquare % 8;
 		List<Integer> knightOffset = new LinkedList<>();
@@ -147,7 +148,7 @@ public class ValidMoves {
 				if (Pieces.isColour(pieceOnTargetSquare, friendlyPiece))
 					continue;
 
-				moves.add(new Move(startSquare, targetSquare));
+				moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
 				if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
 					continue;
