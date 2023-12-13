@@ -30,7 +30,15 @@ public class Board {
 		printBoard();
 		ValidMoves.precomputedMoveData();
 		ValidMoves.generateMove();
-
+		
+		for(int i=0;i<20;i++) {
+			
+			int rand = (int) Math.floor(Math.random()*ValidMoves.moves.size());
+			makeMove(ValidMoves.moves.get(rand));
+		}
+		
+		
+		
 	}
 
 	private static void printBoard() {

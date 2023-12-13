@@ -39,8 +39,13 @@ public class ValidMoves {
 					generatePawnMoves(startSquare, piece);
 				} else if (Pieces.isType(piece, Pieces.knight)) {
 					generateKnightMoves(startSquare, piece);
+				} else if (Pieces.isType(piece, Pieces.king)) {
+					generateKingMoves(startSquare, piece);
 				}
 			}
+		}
+		for (Move move : moves) {
+			System.out.println(move.getStartSquare() + " " + move.getTargetSquare());
 		}
 		return moves;
 	}
@@ -85,6 +90,8 @@ public class ValidMoves {
 
 			int targetSquare = startSquare + directionOffsets[directionIndex];
 			int rank = startSquare / 8;
+			int file = startSquare % 8;
+
 			if (targetSquare >= 0 && targetSquare < 64) {
 				int pieceOnTargetSquare = Board.squares[targetSquare];
 
@@ -95,9 +102,14 @@ public class ValidMoves {
 
 				moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
+			}
+			for (int directionIdx = startDirIndex; directionIdx < endDirIndex; directionIdx++) {
+
+				int pieceOnTargetSquare = Board.squares[targetSquare];
+
 				if ((rank == 6 && Pieces.isColour(piece, Pieces.white))
 						|| (rank == 1 && Pieces.isColour(piece, Pieces.black))) {
-					targetSquare = startSquare + directionOffsets[directionIndex] * 2;
+					targetSquare = startSquare + directionOffsets[directionIdx] * 2;
 					if (Pieces.isColour(pieceOnTargetSquare, friendlyPiece))
 						continue;
 					if (Pieces.isColour(pieceOnTargetSquare, opponentPiece))
@@ -106,8 +118,35 @@ public class ValidMoves {
 					moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSquare));
 
 				}
-
 			}
+
+//			check for captures with a pawn
+//			white pawns
+			if (Pieces.isColour(piece, Pieces.white)) {
+
+				int pieceToCapture = Board.squares[(file - 1) + (rank - 1) * 8];
+				if (Pieces.isColour(pieceToCapture, opponentPiece)) {
+					moves.add(new Move(startSquare, (file - 1) + (rank - 1) * 8, piece, pieceToCapture));
+				}
+				pieceToCapture = Board.squares[(file + 1) + (rank - 1) * 8];
+				if (Pieces.isColour(pieceToCapture, opponentPiece)) {
+					moves.add(new Move(startSquare, (file + 1) + (rank - 1) * 8, piece, pieceToCapture));
+				}
+			}
+
+//			black pawns
+			if (Pieces.isColour(piece, Pieces.black)) {
+
+				int pieceToCapture = Board.squares[(file - 1) + (rank + 1) * 8];
+				if (Pieces.isColour(pieceToCapture, opponentPiece)) {
+					moves.add(new Move(startSquare, (file - 1) + (rank + 1) * 8, piece, pieceToCapture));
+				}
+				pieceToCapture = Board.squares[(file + 1) + (rank + 1) * 8];
+				if (Pieces.isColour(pieceToCapture, opponentPiece)) {
+					moves.add(new Move(startSquare, (file + 1) + (rank + 1) * 8, piece, pieceToCapture));
+				}
+			}
+
 		}
 	}
 
@@ -156,5 +195,31 @@ public class ValidMoves {
 			}
 		}
 	}
+
+	private static void generateKingMoves(int startSquare, int piece) {
+		int friendlyPiece = Board.getIsWhiteMove() ? Pieces.white : Pieces.black;
+		int opponentPiece = Board.getIsWhiteMove() ? Pieces.black : Pieces.white;
+
+		for (int directionIndex = 0; directionIndex < directionOffsets.length; directionIndex++) {
+
+			int targetSquare = startSquare + directionOffsets[directionIndex];
+
+			if (targetSquare >= 0 && targetSquare < 64) {
+
+				int pieceOnTargetSqaure = Board.squares[targetSquare];
+
+				if (Pieces.isColour(pieceOnTargetSqaure, friendlyPiece)) {
+					continue;
+				}
+
+				moves.add(new Move(startSquare, targetSquare, piece, pieceOnTargetSqaure));
+
+				if (Pieces.isColour(pieceOnTargetSqaure, opponentPiece))
+					continue;
+			}
+		}
+	}
+
+//	implementing check 
 
 }
